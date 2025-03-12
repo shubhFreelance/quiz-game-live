@@ -1,0 +1,360 @@
+.sidenav {
+    width: 200px;
+    background-color: #a76666
+    color: rgb(123, 109, 109);
+    padding: 20px;
+  }
+  
+  .sidenav a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    margin: 15px 0;
+  }
+  
+  .logout-btn {
+    background-color: #ff4757;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .dashboard {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .chart-container {
+    margin: 20px 0;
+  }
+  
+  .manager-tables {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .manager-table {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #f4f4f4;
+  }
+
+  .add-manager {
+    padding: 20px;
+  }
+  
+  .add-manager input {
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .add-manager button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .add-manager button:hover {
+    background-color: #45a049;
+  }
+  
+  .manager-list {
+    margin-top: 20px;
+  }
+  
+  .manager-list table {
+    width: 50%;
+    border-collapse: collapse;
+  }
+  
+  .manager-list th, .manager-list td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .manager-list th {
+    background-color: #f4f4f4;
+  }
+
+  
+  
+  /* Dashboard.css */
+.sidenav {
+  width: 200px;
+  background: rgb(0, 0, 0);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-right: 1px solid white
+}
+
+.sidenav a {
+  color: white;
+  text-decoration: none;
+  display: block;
+  margin: 15px 0;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+
+.sidenav a:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.logout-btn {
+  background-color: #ff4757;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #ff6b81;
+}
+
+/* Dashboard.css */
+.dashboard {
+  flex: 1;
+  padding: 20px;
+}
+
+.chart-container {
+  background: rgba(73, 24, 24, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin: 20px 0;
+  animation: slideIn 0.8s ease-in-out;
+}
+
+.dashboard h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Dashboard.css */
+.manager-tables {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.manager-table {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  flex: 1 1 calc(50% - 20px);
+  animation: slideIn 0.8s ease-in-out;
+}
+
+.manager-table h3 {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+tr:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+/* Dashboard.css */
+.results {
+  padding: 20px;
+}
+
+.results h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.results form {
+  margin-bottom: 20px;
+}
+
+.results input {
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  margin-right: 10px;
+  height: 60px;
+  width: 200px
+}
+
+.results button {
+  padding: 10px 20px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.results button:hover {
+  background: #45a049;
+}
+
+.results table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.8s ease-in-out;
+}
+
+.results th, .results td {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  text-align: left;
+}
+
+.results th {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+
+/* Dashboard.css */
+.add-manager {
+  padding: 20px;
+}
+
+.add-manager h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.add-manager input {
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  margin-right: 10px;
+}
+
+.add-manager button {
+  padding: 10px 20px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.add-manager button:hover {
+  background: #45a049;
+}
+
+.manager-list {
+  margin-top: 20px;
+}
+
+.manager-list h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.manager-list table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.8s ease-in-out;
+}
+
+.manager-list th, .manager-list td {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  text-align: left;
+}
+
+.manager-list th {
+  background: rgba(255, 255, 255, 0);
+}
+
+.dashboard {
+  flex: 1;
+  padding: 20px;
+}
+
+.dashboard h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.charts-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.chart-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  flex: 1;
+  animation: slideIn 0.8s ease-in-out;
+}
+
+.chart-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: white;
+}

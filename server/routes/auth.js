@@ -1,19 +1,7 @@
-// import express from 'express';
-// import { register, login } from '../controllers/authController.js';
-
-// const router = express.Router();
-
-// // Register route
-// router.post('/register', register);
-
-// // Login route
-// router.post('/login', login);
-
-// export default router;
 
 import express from 'express';
 import { body, validationResult } from 'express-validator';
-import { register, login } from '../controllers/authController.js';
+import { register, login, logout } from '../controllers/authController.js';
 
 const router = express.Router();
 
@@ -96,4 +84,8 @@ router.post(
   }
 );
 
+
+//Logout
+
+router.post('/logout', logout);
 export default router;

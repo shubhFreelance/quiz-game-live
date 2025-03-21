@@ -1,30 +1,27 @@
 import express from 'express';
 import { body } from 'express-validator';
 import { startSession, endSession } from '../controllers/sessionController.js';
-import{ validate} from '../utils/validate.js';
+import { validate } from '../utils/validate.js';
 import auth from '../middleware/auth.js';
-import { getSessionTotalCollection } from '../controllers/sessionController.js';
-import {getBetsByNumberForSession} from '../controllers/sessionController.js';
-import {getBetsByNumberInSession} from '../controllers/sessionController.js';
+import {
+  getSessionTotalCollection,
+  getBetsByNumberForSession,
+  getBetsByNumberInSession,
+} from '../controllers/sessionController.js';
 
 const router = express.Router();
 
 // Start a new session
 router.post(
   '/start',
-  auth(['superadmin']),
-  validate([
-    body('sessionNumber')
-      .isInt({ min: 1, max: 3 })
-      .withMessage('Session number must be between 1 and 3'),
-  ]),
-  startSession
+  auth(['superadmin']), // Only superadmin can start a session
+  startSession // No validation needed for sessionNumber (it's auto-determined)
 );
 
 // End a session and announce result
 router.post(
   '/end',
-  auth(['superadmin']),
+  auth(['superadmin']), // Only superadmin can end a session
   validate([
     body('sessionId').notEmpty().withMessage('Session ID is required'),
     body('result')
@@ -36,13 +33,13 @@ router.post(
   endSession
 );
 
+// Get total collection for a session
 router.get('/:sessionId/total', getSessionTotalCollection);
 
+// Get bets by number/alphabet for a session
 router.get('/:sessionId/bets', getBetsByNumberForSession);
+
+// Get bets by a specific number/alphabet in a session
 router.get('/:sessionId/number/:numberOrAlphabet', getBetsByNumberInSession);
 
 export default router;
-
-//67d2d8d4b10ed540b158c0a7
-//Agent:67d2c7e29703cfeb5c1e4fb2
-//SessionId: 67d7c5e5391cd48c285e3c36

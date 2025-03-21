@@ -5,12 +5,13 @@ import auth from '../middleware/auth.js';
 const router = express.Router();
 
 // Get agent-specific report
-router.get('/agent/:agentId', auth(['superadmin']), getAgentReport);
+// router.get('/agent/:agentId', auth(['superadmin']), getAgentReport);
+router.get('/agent/:agentId', getAgentReport);
 
 // Get session-specific report
-router.get('/session/:sessionId', auth(['superadmin']), getSessionReport);
+router.get('/session/:sessionId', getSessionReport);
 
 // Get daily report
-router.get('/daily/:date', auth(['superadmin']), getDailyReport);
+router.get('/daily/:date', getDailyReport);
 
 export default router;

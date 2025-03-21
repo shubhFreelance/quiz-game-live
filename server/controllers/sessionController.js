@@ -2,20 +2,33 @@ import Session from '../models/Session.js';
 import Result from '../models/Result.js';
 
 export const startSession = async (req, res) => {
-  const { sessionNumber } = req.body;
-
   try {
-    // Validate sessionNumber
-    if (![1, 2, 3].includes(sessionNumber)) {
-      return res.status(400).json({ message: 'Invalid session number. Must be 1, 2, or 3.' });
+    // Get the current date (start of the day)
+    const now = new Date();
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0); // Start of the day (00:00:00)
+    const endOfDay = new Date(now);
+    endOfDay.setHours(23, 59, 59, 999); // End of the day (23:59:59.999)
+
+    // Find the last session for the current day
+    const lastSession = await Session.findOne({
+      date: { $gte: startOfDay, $lt: endOfDay },
+    }).sort({ sessionNumber: -1 }); // Sort by sessionNumber in descending order
+
+    // Determine the next session number
+    let nextSessionNumber = 1; // Default to session 1
+    if (lastSession) {
+      if (lastSession.sessionNumber === 3) {
+        return res.status(400).json({ message: 'All sessions for the day have already been started.' });
+      }
+      nextSessionNumber = lastSession.sessionNumber + 1; // Increment session number
     }
 
-    // Calculate start and end times based on sessionNumber
-    const now = new Date();
+    // Calculate start and end times based on session number
     const startTime = new Date(now);
     const endTime = new Date(now);
 
-    switch (sessionNumber) {
+    switch (nextSessionNumber) {
       case 1:
         startTime.setHours(9, 0, 0, 0); // 9 AM
         endTime.setHours(12, 0, 0, 0); // 12 PM
@@ -31,7 +44,13 @@ export const startSession = async (req, res) => {
     }
 
     // Create a new session
-    const session = new Session({ sessionNumber, startTime, endTime });
+    const session = new Session({
+      sessionNumber: nextSessionNumber,
+      date: now, // Current date and time
+      startTime,
+      endTime,
+    });
+
     await session.save();
 
     res.status(201).json({ message: 'Session started successfully', session });

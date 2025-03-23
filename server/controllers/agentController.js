@@ -101,3 +101,40 @@ export const getAgentBetsByNumberForSession = async (req, res) => {
 };
 
 
+//calculate daily collection
+export const calculateDailyCollections = async () => {
+  try {
+    // Get the start and end of the current day
+    const now = new Date();
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0); // Start of the day (00:00:00)
+    const endOfDay = new Date(now);
+    endOfDay.setHours(23, 59, 59, 999); // End of the day (23:59:59.999)
+
+    // Find all users (agents and superadmins)
+    const users = await User.find({ role: { $in: ['agent', 'superadmin'] } });
+
+    // Calculate daily collections for each user
+    for (const user of users) {
+      // Find all session collections for the current day
+      const sessionsForDay = user.sessionCollections.filter((collection) => {
+        return collection.sessionId.date >= startOfDay && collection.sessionId.date <= endOfDay;
+      });
+
+      // Calculate the total collection for the day
+      const totalAmount = sessionsForDay.reduce((sum, collection) => sum + collection.amount, 0);
+
+      // Save the daily collection to the user's dailyCollections array
+      user.dailyCollections.push({ date: startOfDay, totalAmount });
+      await user.save();
+    }
+
+    console.log('Daily collections calculated and saved successfully.');
+  } catch (error) {
+    console.error('Error calculating daily collections:', error.message);
+  }
+};
+
+//Get Daily Collections for a superAdmin
+
+

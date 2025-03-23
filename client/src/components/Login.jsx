@@ -63,7 +63,7 @@ const Login = () => {
           });
         })
         .catch((err) => {
-          showMessage("warning", "Please fill all the fields");
+          showMessage("error", err.response.data.message);
           console.log(err);
         });
 

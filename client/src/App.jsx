@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SideNavbar from "./components/SideNavbar";
 import Dashboard from "./components/Dashboard";
@@ -13,9 +13,37 @@ import Betting from "./components/Betting";
 import axios from "axios";
 
 function App() {
-  const { isloggedin } = useContext(ContextApi);
+  const { isloggedin, setisloggedin, setRole } = useContext(ContextApi);
 
   axios.defaults.baseURL = "http://localhost:5001";
+
+  useEffect(() => {
+    fetchAgentId();
+  }, []);
+
+  //For Maintaining states of role and login after refresh
+  const fetchAgentId = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/");
+      setisloggedin(false);
+    } else {
+      axios
+        .get("/api/agent/current-agent-id", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
+        .then((res) => {
+          setRole("agent");
+        })
+        .catch((err) => {
+          setRole("superadmin");
+        });
+      setisloggedin(true);
+    }
+  };
 
   return (
     <ConfigProvider

@@ -1,8 +1,9 @@
 import { Tooltip } from "antd";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BarChart, Bar, CartesianGrid, Legend, XAxis, YAxis } from "recharts";
 import "../styles/Dashboard.css";
 import Betting from "./Betting";
+import axios from "axios";
 
 const AgentDashboard = () => {
   const barData = [
@@ -21,30 +22,108 @@ const AgentDashboard = () => {
     { name: "Q", amount: 9108 },
     { name: "A", amount: 11108 },
   ];
+  const [sessionStatus, setSessionStatus] = useState("");
+  const [agentId, setAgentId] = useState("");
+  const [sessionData, setSessionData] = useState([]);
+  const [amount, setAmount] = useState("");
+
+  useEffect(() => {
+    fetchSessionId();
+    fetchAgentId();
+    fetchAmount();
+  }, [sessionStatus]); // Call API whenever sessionStatus changes
+
+  //For Fetching Session Id
+  const fetchSessionId = () => {
+    axios
+      .get("/api/session/active")
+      .then((res) => {
+        // console.log("Session Active Data:", res.data);
+        setSessionData(res.data);
+        setSessionStatus(res.data.status);
+      })
+      .catch((err) => {
+        setSessionStatus("close");
+        // console.log("Noo");
+
+        console.error("Error fetching session data:", err);
+      });
+  };
+
+  //For Fetching AgentId
+  const fetchAgentId = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/");
+    } else {
+      axios
+        .get("/api/agent/current-agent-id", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
+        .then((res) => {
+          // console.log("Agent Id", res.data);
+          setAgentId(res.data.agentId);
+          // setSessionStatus(res.data.status);
+        })
+        .catch((err) => {
+          // setSessionStatus("close");
+          console.error("Error fetching Agent Id:", err);
+        });
+    }
+  };
+
+  //For Amount Collected in a session by Agent
+  const fetchAmount = () => {
+    axios
+      .get(`/api/agent/${agentId}/session/${sessionData._id}`)
+      .then((res) => {
+        // console.log("Session Amount:", res.data);
+        setAmount(res.data.amount);
+      })
+      .catch((err) => {
+        // setSessionStatus("close");
+        // console.log("Noo")
+        console.error("Error fetching session data:", err);
+      });
+  };
 
   const managers = [
     { id: 1, name: "Amounts", data: { 1: 100, 2: 200, A: 300 } },
   ];
 
   return (
-    <div className="dashboard">
-      <h1 className="text-white">Agent Dashboard</h1>
+    <div className="dashboard text-white">
+      <h1 className="">Agent Dashboard</h1>
       <div
-        className="chart-container d-flex flex-column justify-content-center align-items-center"
+        className="d-flex w-100 gap-3 flex-row justify-content-center "
         style={{ width: "700px", minWidth: "600px" }}
       >
-        <h2>Amount Collected per Number/Alphabet</h2>
-        <BarChart width={500} height={300} data={barData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="amount" fill="#8884d8" />
-        </BarChart>
+        <div className="chart-container">
+          <h2>Amount Collected per Number/Alphabet</h2>
+          <BarChart width={500} height={300} data={barData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="amount" fill="#8884d8" />
+          </BarChart>
+        </div>
+        <div className="chart-container ">
+          <h2>Total Amounts Collected in a Session</h2>
+          <h1>{amount}</h1>
+        </div>
       </div>
 
-      <Betting />
+      <Betting
+        agentId={agentId}
+        sessionId={sessionData._id}
+        sessionStatus={sessionStatus}
+        fetchAmount={fetchAmount}
+      />
     </div>
   );
 };

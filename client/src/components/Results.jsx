@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Card, ConfigProvider, Input, Modal, theme } from "antd";
 import "../styles/Results.css";
 import axios from "axios";
 
 const Results = () => {
   const [sessionData, setSessionData] = useState([]);
-  const [strt, setstrt] = useState(true);
+  const [result, setResult] = useState("");
+  const [sessionStatus, setSessionStatus] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const sessionTimings = {
     1: "9:00 AM - 12:00 PM",
@@ -19,8 +20,22 @@ const Results = () => {
     { title: "Session 3", time: "5PM-9PM" },
   ];
 
-  const handleSessionToggle = () => {
-    // Only allow starting if session number is entered
+  useEffect(() => {
+    fetchSessionStatus();
+  }, [sessionStatus]); // Call API whenever sessionStatus changes
+
+  const fetchSessionStatus = () => {
+    axios
+      .get("/api/session/active")
+      .then((res) => {
+        console.log("Session Active Data:", res.data);
+        setSessionData(res.data);
+        setSessionStatus(res.data.status);
+      })
+      .catch((err) => {
+        setSessionStatus("close");
+        console.error("Error fetching session data:", err);
+      });
   };
 
   const handleStart = () => {
@@ -41,9 +56,10 @@ const Results = () => {
         )
         .then((res) => {
           console.log("Agent Data:", res.data);
-          setSessionData(res.data.session);
+          // setSessionData(res.data.session);
           console.log("session :", sessionData);
-          alert("data come");
+          // alert("data come");
+          fetchSessionStatus();
         })
         .catch((err) => {
           // navigate("/login");
@@ -51,11 +67,43 @@ const Results = () => {
         });
     }
   };
+  const handleChange = (e) => {
+    setResult(e.target.value);
+  };
 
   const handleEnd = () => {
     console.log("End Click");
     setIsModalOpen(true);
   };
+  const handleDeclare = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/");
+    } else {
+      axios
+        .post(
+          "/api/session/end",
+          { result },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          console.log("Session Ended Successfully", res.data);
+          setIsModalOpen(false);
+          setSessionData(null);
+          fetchSessionStatus();
+        })
+        .catch((err) => {
+          // navigate("/login");
+          console.log("Error Session End:", err);
+        });
+    }
+  };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -71,7 +119,7 @@ const Results = () => {
           >
             <h5 className="text-white text-center">{session.title}</h5>
             <h6 className="text-white text-center my-3">{session.time}</h6>
-            {strt ? (
+            {sessionStatus === "close" ? (
               <Button
                 type="primary"
                 style={{
@@ -106,14 +154,19 @@ const Results = () => {
                       color="danger"
                       variant="solid"
                       block
-                      onClick={handleCancel}
+                      onClick={handleDeclare}
                     >
                       Declare & End
                     </Button>,
                   ]}
                 >
                   <h6>Result</h6>
-                  <Input name="result" className="my-3" />
+                  <Input
+                    name="result"
+                    value={result}
+                    onChange={handleChange}
+                    className="my-3"
+                  />
                 </Modal>
               </>
             )}

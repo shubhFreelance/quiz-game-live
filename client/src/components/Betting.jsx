@@ -1,10 +1,11 @@
 import { Button, Input } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/Dashboard.css";
+import axios from "axios";
 
 // import axios from "axios";
 
-const Betting = () => {
+const Betting = ({ agentId, sessionId, sessionStatus, fetchAmount }) => {
   const [rows, setRows] = useState([
     { id: 1, value: "", apiUrl: "https://api.example.com/submit1" },
     { id: 2, value: "", apiUrl: "https://api.example.com/submit2" },
@@ -28,20 +29,34 @@ const Betting = () => {
     );
   };
 
+  // console.log("Betting :", agentId, sessionId, sessionStatus);
+
   const handleSubmit = async (id) => {
     const row = rows.find((row) => row.id === id);
     if (!row.value.trim()) {
       alert("Input cannot be empty!");
       return;
+    } else {
+      const numberOrAlphabet = row.id;
+      const amount = row.value;
+      axios
+        .post("/api/bet/bet", {
+          agentId,
+          numberOrAlphabet,
+          amount,
+          sessionId,
+        })
+        .then((res) => {
+          console.log("Successfull bet:", res.data);
+          fetchAmount();
+          // setSessionData(res.data);
+          // setSessionStatus(res.data.status);
+        })
+        .catch((err) => {
+          console.error("Error Betting:", err);
+        });
     }
-    console.log(row.value);
-
-    // try {
-    //   const response = await axios.post(row.apiUrl, { data: row.value });
-    //   alert(`Success: ${response.data.message}`);
-    // } catch (error) {
-    //   alert(`Error: ${error.response?.data?.message || error.message}`);
-    // }
+    // console.log(row.value);
   };
 
   return (
@@ -67,10 +82,15 @@ const Betting = () => {
                     value={row.value}
                     onChange={(e) => handleChange(row.id, e.target.value)}
                     placeholder="Enter data"
+                    disabled={sessionStatus === "close"}
                   />
                 </td>
                 <td className="w-25">
-                  <Button type="primary" onClick={() => handleSubmit(row.id)}>
+                  <Button
+                    type="primary"
+                    disabled={sessionStatus === "close"}
+                    onClick={() => handleSubmit(row.id)}
+                  >
                     Submit
                   </Button>
                 </td>

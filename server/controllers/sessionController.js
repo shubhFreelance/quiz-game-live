@@ -3,6 +3,14 @@ import Result from '../models/Result.js';
 
 export const startSession = async (req, res) => {
   try {
+    // Check if there is already an active session
+    const activeSession = await Session.findOne({ status: 'open' });
+    if (activeSession) {
+      return res.status(400).json({
+        message: 'Another session is already active. Please end the current session before starting a new one.',
+      });
+    }
+
     // Get the current date (start of the day)
     const now = new Date();
     const startOfDay = new Date(now);
@@ -61,18 +69,21 @@ export const startSession = async (req, res) => {
 
 // End a session and announce result
 export const endSession = async (req, res) => {
-  const { sessionId, result } = req.body;
+  const { result } = req.body; // Only the result is required in the request body
 
   try {
-    // Validate result
-    if (!['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'J', 'Q', 'K', 'Joker'].includes(result)) {
-      return res.status(400).json({ message: 'Invalid result' });
+    // Find the latest active session
+    const session = await Session.findOne({ status: 'open' }).sort({ createdAt: -1 }); // Sort by createdAt in descending order
+
+    // If no active session is found, return an error
+    if (!session) {
+      return res.status(404).json({ message: 'No active session found.' });
     }
 
-    // Find the session
-    const session = await Session.findById(sessionId);
-    if (!session) {
-      return res.status(404).json({ message: 'Session not found' });
+    // Validate the result
+    const validResults = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'J', 'Q', 'K', 'Joker'];
+    if (!validResults.includes(result)) {
+      return res.status(400).json({ message: 'Invalid result.' });
     }
 
     // Update session with result and close it
@@ -80,11 +91,48 @@ export const endSession = async (req, res) => {
     session.status = 'closed'; // Close the session
     await session.save();
 
-    // Save the result in a separate collection (optional)
-    const resultEntry = new Result({ sessionId, result });
-    await resultEntry.save();
-
     res.status(200).json({ message: 'Session ended and result announced', session });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+//End all session forcefully
+
+export const endAllSessions = async (req, res) => {
+  try {
+    // Find all sessions that are currently open
+    const activeSessions = await Session.find({ status: 'open' });
+
+    // If no active sessions are found, return a message
+    if (activeSessions.length === 0) {
+      return res.status(200).json({ message: 'No active sessions found.' });
+    }
+
+    // Update all active sessions to closed
+    await Session.updateMany(
+      { status: 'open' }, // Filter for active sessions
+      { $set: { status: 'closed' } } // Update status to closed
+    );
+
+    res.status(200).json({ message: 'All active sessions have been ended.', closedSessions: activeSessions.length });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+
+//Get the active session
+export const getActiveSession = async (req, res) => {
+  try {
+    // Find the session that is currently open
+    const activeSession = await Session.findOne({ status: 'open' });
+
+    if (!activeSession) {
+      return res.status(404).json({ message: 'No active session found' });
+    }
+
+    res.status(200).json(activeSession);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

@@ -7,6 +7,8 @@ import {
   getSessionTotalCollection,
   getBetsByNumberForSession,
   getBetsByNumberInSession,
+  getActiveSession,
+  endAllSessions
 } from '../controllers/sessionController.js';
 
 const router = express.Router();
@@ -23,7 +25,6 @@ router.post(
   '/end',
   auth(['superadmin']), // Only superadmin can end a session
   validate([
-    body('sessionId').notEmpty().withMessage('Session ID is required'),
     body('result')
       .notEmpty()
       .withMessage('Result is required')
@@ -38,6 +39,9 @@ router.get('/:sessionId/total', getSessionTotalCollection);
 
 // Get bets by number/alphabet for a session
 router.get('/:sessionId/bets', getBetsByNumberForSession);
+
+router.get('/active', getActiveSession);
+router.post('/end-all', endAllSessions);
 
 // Get bets by a specific number/alphabet in a session
 router.get('/:sessionId/number/:numberOrAlphabet', getBetsByNumberInSession);

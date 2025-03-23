@@ -136,5 +136,39 @@ export const calculateDailyCollections = async () => {
 };
 
 //Get Daily Collections for a superAdmin
+export const calculateSuperadminDailyCollection = async () => {
+  try {
+    // Get the start and end of the current day
+    const now = new Date();
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0); // Start of the day (00:00:00)
+    const endOfDay = new Date(now);
+    endOfDay.setHours(23, 59, 59, 999); // End of the day (23:59:59.999)
 
+    // Find all sessions for the current day
+    const sessionsForDay = await Session.find({
+      date: { $gte: startOfDay, $lte: endOfDay },
+    });
+
+    // Calculate the total collection for the day
+    const totalAmountCollected = sessionsForDay.reduce(
+      (sum, session) => sum + session.totalAmountCollected,
+      0
+    );
+
+    // Find the superadmin user
+    const superadmin = await User.findOne({ role: 'superadmin' });
+    if (!superadmin) {
+      throw new Error('Superadmin not found.');
+    }
+
+    // Save the daily collection to the superadmin's dailyCollections array
+    superadmin.dailyCollections.push({ date: startOfDay, totalAmount: totalAmountCollected });
+    await superadmin.save();
+
+    console.log('Superadmin daily collection calculated and saved successfully.');
+  } catch (error) {
+    console.error('Error calculating superadmin daily collection:', error.message);
+  }
+};
 

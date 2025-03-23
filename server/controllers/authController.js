@@ -114,8 +114,14 @@ export const login = async (req, res) => {
 
     // Set the token in a cookie
     res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-    console.log("Successful login: ", token)
-    res.status(200).json({ message: 'Login successful', token });
+
+    // Return the token, userId, and userRole in the response
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      userId: user._id,
+      userRole: user.role,
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -134,5 +140,29 @@ export const logout = async (req, res) => {
     res.status(200).json({ message: 'Logout successful' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+//Get Current User
+export const getCurrentUser = async (req, res) => {
+  try {
+    // Extract the token from the request headers
+    const token = req.headers.authorization?.replace("Bearer ", "");
+
+    // Find the user by ID (from the authenticated request)
+    const user = await User.findById(req.userId).select("-password"); // Exclude password
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Return the user details, token, and role
+    res.status(200).json({
+      userId: user._id,
+      token,
+      role: user.role,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };

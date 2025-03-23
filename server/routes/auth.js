@@ -1,7 +1,8 @@
 
 import express from 'express';
-import { body, validationResult } from 'express-validator';
-import { register, login, logout } from '../controllers/authController.js';
+import { body, validationResult, } from 'express-validator';
+import auth from '../middleware/auth.js';
+import { register, login, logout, getCurrentUser } from '../controllers/authController.js';
 
 const router = express.Router();
 
@@ -88,4 +89,9 @@ router.post(
 //Logout
 
 router.post('/logout', logout);
+
+
+// get current user
+router.get("/current-user", auth(["agent", "superadmin"]), getCurrentUser);
+
 export default router;

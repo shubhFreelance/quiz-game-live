@@ -41,10 +41,5 @@ router.get('/superadmin/daily-collection', auth(['superadmin']), getSuperadminDa
 router.get('/overall-collection', auth(['superadmin']), getOverallCollection);
 
 
-//Get current user(agent) id
-router.get('/current-agent-id', auth(['agent']), (req, res) => {
-  res.status(200).json({ agentId: req.userId });
-});
-
 
 export default router;

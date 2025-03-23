@@ -1,6 +1,76 @@
 import Session from '../models/Session.js';
 import Result from '../models/Result.js';
 
+
+//original code
+// export const startSession = async (req, res) => {
+//   try {
+//     // Check if there is already an active session
+//     const activeSession = await Session.findOne({ status: 'open' });
+//     if (activeSession) {
+//       return res.status(400).json({
+//         message: 'Another session is already active. Please end the current session before starting a new one.',
+//       });
+//     }
+
+//     // Get the current date (start of the day)
+//     const now = new Date();
+//     const startOfDay = new Date(now);
+//     startOfDay.setHours(0, 0, 0, 0); // Start of the day (00:00:00)
+//     const endOfDay = new Date(now);
+//     endOfDay.setHours(23, 59, 59, 999); // End of the day (23:59:59.999)
+
+//     // Find the last session for the current day
+//     const lastSession = await Session.findOne({
+//       date: { $gte: startOfDay, $lt: endOfDay },
+//     }).sort({ sessionNumber: -1 }); // Sort by sessionNumber in descending order
+
+//     // Determine the next session number
+//     let nextSessionNumber = 1; // Default to session 1
+//     if (lastSession) {
+//       if (lastSession.sessionNumber === 3) {
+//         return res.status(400).json({ message: 'All sessions for the day have already been started.' });
+//       }
+//       nextSessionNumber = lastSession.sessionNumber + 1; // Increment session number
+//     }
+
+//     // Calculate start and end times based on session number
+//     const startTime = new Date(now);
+//     const endTime = new Date(now);
+
+//     switch (nextSessionNumber) {
+//       case 1:
+//         startTime.setHours(9, 0, 0, 0); // 9 AM
+//         endTime.setHours(12, 0, 0, 0); // 12 PM
+//         break;
+//       case 2:
+//         startTime.setHours(13, 0, 0, 0); // 1 PM
+//         endTime.setHours(16, 0, 0, 0); // 4 PM
+//         break;
+//       case 3:
+//         startTime.setHours(17, 0, 0, 0); // 5 PM
+//         endTime.setHours(20, 0, 0, 0); // 8 PM
+//         break;
+//     }
+
+//     // Create a new session
+//     const session = new Session({
+//       sessionNumber: nextSessionNumber,
+//       date: now, // Current date and time
+//       startTime,
+//       endTime,
+//     });
+
+//     await session.save();
+
+//     res.status(201).json({ message: 'Session started successfully', session });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Server error', error: error.message });
+//   }
+// };
+
+
+//for test purposes- 20 sessions
 export const startSession = async (req, res) => {
   try {
     // Check if there is already an active session
@@ -26,7 +96,7 @@ export const startSession = async (req, res) => {
     // Determine the next session number
     let nextSessionNumber = 1; // Default to session 1
     if (lastSession) {
-      if (lastSession.sessionNumber === 3) {
+      if (lastSession.sessionNumber === 20) { // Allow up to 20 sessions for testing
         return res.status(400).json({ message: 'All sessions for the day have already been started.' });
       }
       nextSessionNumber = lastSession.sessionNumber + 1; // Increment session number
@@ -36,20 +106,11 @@ export const startSession = async (req, res) => {
     const startTime = new Date(now);
     const endTime = new Date(now);
 
-    switch (nextSessionNumber) {
-      case 1:
-        startTime.setHours(9, 0, 0, 0); // 9 AM
-        endTime.setHours(12, 0, 0, 0); // 12 PM
-        break;
-      case 2:
-        startTime.setHours(13, 0, 0, 0); // 1 PM
-        endTime.setHours(16, 0, 0, 0); // 4 PM
-        break;
-      case 3:
-        startTime.setHours(17, 0, 0, 0); // 5 PM
-        endTime.setHours(20, 0, 0, 0); // 8 PM
-        break;
-    }
+    // For testing, you can reduce the duration of each session or keep the same timing
+    const sessionDuration = 30; // 30 minutes per session (for testing)
+    startTime.setHours(9, 0, 0, 0); // Start at 9 AM
+    startTime.setMinutes(startTime.getMinutes() + (nextSessionNumber - 1) * sessionDuration); // Increment start time
+    endTime.setTime(startTime.getTime() + sessionDuration * 60 * 1000); // Add session duration
 
     // Create a new session
     const session = new Session({

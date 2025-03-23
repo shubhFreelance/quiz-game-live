@@ -185,7 +185,10 @@ export const getOverallCollection = async (req, res) => {
       0
     );
 
-    res.status(200).json({ totalCollection });
+    // Get the total number of sessions played
+    const totalSessionsPlayed = allSessions.length;
+
+    res.status(200).json({ totalCollection, totalSessionsPlayed });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

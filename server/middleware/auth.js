@@ -8,10 +8,10 @@ import User from '../models/User.js';
  */
 const auth = (roles = []) => {
   return async (req, res, next) => {
-    // Get the token from the request header
+   
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
-    // Check if the token exists
+    
     if (!token) {
       return res.status(401).json({ message: 'Access denied. No token provided.' });
     }
@@ -26,11 +26,10 @@ const auth = (roles = []) => {
         return res.status(401).json({ message: 'Invalid token. User not found.' });
       }
 
-      // Attach the user and role to the request object
       req.userId = decoded.userId;
       req.role = decoded.role;
 
-      // Check if the user's role is allowed
+  
       if (roles.length && !roles.includes(decoded.role)) {
         return res.status(403).json({ message: 'Access denied. You do not have the required role.' });
       }

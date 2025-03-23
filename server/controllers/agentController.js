@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import Session from '../models/Session.js';
 import bcrypt from 'bcryptjs';
 
 // Get all agents

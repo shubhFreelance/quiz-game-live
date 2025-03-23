@@ -1,15 +1,28 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import '../styles/Dashboard.css'
+import React, { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "../styles/Dashboard.css";
+import { ContextApi } from "../stores/ContextApi";
 
 const SideNavbar = () => {
+  const { setisloggedin, role } = useContext(ContextApi);
+  const navigate = useNavigate();
+
+  console.log(role);
+
+  const handleLogOut = () => {
+    localStorage.removeItem("token");
+    setisloggedin(false);
+    navigate("/");
+  };
   return (
     <div className="sidenav">
       <h2>Winner Dashboard</h2>
-      <Link to="/">Dashboard</Link>
-      <Link to="/add-manager">Add Manager</Link>
-      <Link to="/results">Results</Link>
-      <button className="logout-btn">Logout</button>
+      <Link to="/dashboard">Dashboard</Link>
+      {role === "superadmin" && <Link to="/add-manager">Add Manager</Link>}
+      {role === "superadmin" && <Link to="/results">Session & Results</Link>}
+      <button className="logout-btn" onClick={handleLogOut}>
+        Logout
+      </button>
     </div>
   );
 };

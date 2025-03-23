@@ -10,9 +10,14 @@ import reportRoutes from './routes/report.js';
 import resultRoutes from './routes/result.js';
 import { getDailyCollection, getSuperadminDailyCollection } from './controllers/agentController.js';
 
+import cors from 'cors';
 
 dotenv.config();
 const app = express();
+app.use(cors({
+  origin: "http://localhost:5173", // Your frontend URL
+  credentials: true // If using cookies or authentication
+}));
 const PORT = process.env.PORT || 5001;
 
 // Connect to MongoDB

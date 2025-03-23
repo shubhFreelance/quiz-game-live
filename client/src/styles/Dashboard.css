@@ -1,6 +1,6 @@
 .sidenav {
     width: 200px;
-    background-color: #a76666
+    background-color: #a76666;
     color: rgb(123, 109, 109);
     padding: 20px;
   }
@@ -357,4 +357,51 @@ tr:hover {
   font-size: 1.5rem;
   margin-bottom: 10px;
   color: white;
+}
+
+.custom-input::placeholder {
+  color: rgb(117, 117, 117) !important;
+  opacity: 1; 
+}
+.custom-select .ant-select-selection-placeholder {
+  color: rgb(116, 116, 116) !important; 
+}
+
+.ant-select {
+  background-color: #1f1f1f !important;
+  color: white !important;
+}
+.ant-select-selector {
+  background-color: #ffffff !important;
+  border-color: #000000 !important;
+  color: rgb(65, 65, 65) !important;
+}
+
+.ant-select-selection-placeholder {
+  color: rgba(0, 38, 255, 0.932) !important;
+}
+
+
+/* .ant-select-dropdown {
+  background-color: #1f1f1f !important;
+  border: 1px solid #434343 !important;
+} */
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: #111 !important;
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #c42394 !important;
+} */
+
+.ant-select-item {
+  color: rgb(124, 124, 124) !important;
+}
+
+.glass-effect {
+  background: rgba(31, 31, 31, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }

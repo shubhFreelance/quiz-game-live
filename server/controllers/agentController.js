@@ -102,7 +102,7 @@ export const getAgentBetsByNumberForSession = async (req, res) => {
 
 
 //calculate daily collection
-export const calculateDailyCollections = async () => {
+export const getDailyCollection = async () => {
   try {
     // Get the start and end of the current day
     const now = new Date();
@@ -136,7 +136,7 @@ export const calculateDailyCollections = async () => {
 };
 
 //Get Daily Collections for a superAdmin
-export const calculateSuperadminDailyCollection = async () => {
+export const getSuperadminDailyCollection = async () => {
   try {
     // Get the start and end of the current day
     const now = new Date();
@@ -172,3 +172,20 @@ export const calculateSuperadminDailyCollection = async () => {
   }
 };
 
+//Get overall collection for a superAdmin
+export const getOverallCollection = async (req, res) => {
+  try {
+    // Find all sessions
+    const allSessions = await Session.find();
+
+    // Calculate the total collection across all sessions
+    const totalCollection = allSessions.reduce(
+      (sum, session) => sum + session.totalAmountCollected,
+      0
+    );
+
+    res.status(200).json({ totalCollection });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

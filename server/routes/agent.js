@@ -3,7 +3,7 @@ import { body } from 'express-validator';
 import { getAllAgents, getAgentById, updateAgent } from '../controllers/agentController.js';
 import {validate} from '../utils/validate.js';
 import auth from '../middleware/auth.js';
-import { getAgentSessionCollection, getDailyCollection, getSuperadminDailyCollection } from '../controllers/agentController.js';
+import { getAgentSessionCollection, getDailyCollection, getSuperadminDailyCollection, getOverallCollection } from '../controllers/agentController.js';
 import {getAgentBetsByNumberForSession} from '../controllers/agentController.js';
 const router = express.Router();
 
@@ -36,5 +36,8 @@ router.get('/daily-collection', auth(['agent', 'superadmin']), getDailyCollectio
 
 // Get superadmin's daily collection
 router.get('/superadmin/daily-collection', auth(['superadmin']), getSuperadminDailyCollection);
+
+//getOverall collection
+router.get('/overall-collection', auth(['superadmin']), getOverallCollection);
 
 export default router;

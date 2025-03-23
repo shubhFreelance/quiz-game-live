@@ -8,7 +8,7 @@ import sessionRoutes from './routes/session.js';
 import agentRoutes from './routes/agent.js';
 import reportRoutes from './routes/report.js';
 import resultRoutes from './routes/result.js';
-import { calculateDailyCollections, calculateSuperadminDailyCollection } from './controllers/agentController.js';
+import { getDailyCollection, getSuperadminDailyCollection } from './controllers/agentController.js';
 
 
 dotenv.config();
@@ -36,6 +36,6 @@ app.listen(PORT, () => {
 
 cron.schedule('59 23 * * *', async () => {
   console.log('Calculating daily collections...');
-  await calculateDailyCollections(); // Calculate daily collections for agents
-  await calculateSuperadminDailyCollection(); // Calculate daily collection for superadmin
-});cd
+  await getDailyCollection(); // Calculate daily collections for agents
+  await getSuperadminDailyCollection(); // Calculate daily collection for superadmin
+});

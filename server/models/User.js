@@ -1,16 +1,20 @@
 import mongoose from 'mongoose';
 
-
-
 const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
+  username: { type: String, required: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['superadmin', 'manager', 'agent'], default: 'agent' },
-  totalCollected: { type: Number, default: 0 }, // Total money collected by the agent
+  role: { type: String, enum: ['superadmin', 'manager', 'agent'], required: true },
+  totalCollected: { type: Number, default: 0 }, // Total collection across all sessions
   sessionCollections: [
     {
       sessionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Session' },
-      amount: { type: Number, default: 0 }, // Amount collected by the agent for this session
+      amount: { type: Number, default: 0 },
+    },
+  ],
+  dailyCollections: [
+    {
+      date: { type: Date, required: true }, // Date of the collection
+      totalAmount: { type: Number, default: 0 }, // Total collection for the day
     },
   ],
 });

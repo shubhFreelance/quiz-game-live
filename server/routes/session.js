@@ -16,14 +16,13 @@ const router = express.Router();
 // Start a new session
 router.post(
   '/start',
-  auth(['superadmin']), // Only superadmin can start a session
-  startSession // No validation needed for sessionNumber (it's auto-determined)
+  auth(['superadmin']), 
+  startSession
 );
 
-// End a session and announce result
 router.post(
   '/end',
-  auth(['superadmin']), // Only superadmin can end a session
+  auth(['superadmin']), 
   validate([
     body('result')
       .notEmpty()

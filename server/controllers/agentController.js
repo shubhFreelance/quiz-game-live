@@ -154,10 +154,10 @@ export const getDailyCollection = async () => {
         return collection.sessionId.date >= startOfDay && collection.sessionId.date <= endOfDay;
       });
 
-      // Calculate the total collection for the day
+      
       const totalAmount = sessionsForDay.reduce((sum, collection) => sum + collection.amount, 0);
 
-      // Save the daily collection to the user's dailyCollections array
+      
       user.dailyCollections.push({ date: startOfDay, totalAmount });
       await user.save();
     }
@@ -169,39 +169,44 @@ export const getDailyCollection = async () => {
 };
 
 //Get Daily Collections for a superAdmin
-export const getSuperadminDailyCollection = async () => {
+export const getSuperadminDailyCollection = async (req, res)  => {
   try {
     // Get the start and end of the current day
-    const now = new Date();
-    const startOfDay = new Date(now);
-    startOfDay.setHours(0, 0, 0, 0); // Start of the day (00:00:00)
-    const endOfDay = new Date(now);
-    endOfDay.setHours(23, 59, 59, 999); // End of the day (23:59:59.999)
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
 
-    // Find all sessions for the current day
+    // Find all closed sessions for the current day
     const sessionsForDay = await Session.find({
       date: { $gte: startOfDay, $lte: endOfDay },
-    });
+      status: 'closed'
+    }).select('_id totalAmountCollected');
 
-    // Calculate the total collection for the day
-    const totalAmountCollected = sessionsForDay.reduce(
-      (sum, session) => sum + session.totalAmountCollected,
+    // Calculate total daily collection
+    const totalDailyCollection = sessionsForDay.reduce(
+      (sum, session) => sum + (session.totalAmountCollected || 0),
       0
     );
 
-    // Find the superadmin user
-    const superadmin = await User.findOne({ role: 'superadmin' });
-    if (!superadmin) {
-      throw new Error('Superadmin not found.');
-    }
+    // Get just the session IDs
+    const sessionIDs = sessionsForDay.map(session => session._id);
 
-    // Save the daily collection to the superadmin's dailyCollections array
-    superadmin.dailyCollections.push({ date: startOfDay, totalAmount: totalAmountCollected });
-    await superadmin.save();
+    // Send the response
+    res.status(200).json({
+      success: true,
+      date: startOfDay,
+      totalDailyCollection,
+      sessionIDs,
+      sessionCount: sessionsForDay.length
+    });
 
-    console.log('Superadmin daily collection calculated and saved successfully.');
   } catch (error) {
-    console.error('Error calculating superadmin daily collection:', error.message);
+    console.error('Error calculating daily collection:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 

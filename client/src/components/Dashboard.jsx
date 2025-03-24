@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [currentSession, setCurrentSession] = useState(null);
   const { user } = useAuth();
   const [barData, setBarData] = useState([])
+  const [totalCollection, setTotalCollection] = useState(0);
   // Sample data for Bar Chart
 
 
@@ -46,7 +47,7 @@ const Dashboard = () => {
       console.log("SESSSIONRES",sessionRes.data)
       const { betsByNumber } = sessionRes.data;
   
-        // Update the chart data
+     
         const chartData = betsByNumber.map((bet) => ({
           name: bet.numberOrAlphabet.toString(),
           amount: bet.totalAmount,
@@ -63,6 +64,27 @@ const Dashboard = () => {
   }
   fetchCollectionByNumberForSession();
 }, []);
+
+
+//Total Collection in a day
+useEffect(() => {
+  const fetchCollectionForToday= async () => {
+    try {
+      const response = await axios.get("/api/agent/superadmin/daily-collection", getAuthHeader());
+      console.log("Daily Collection",response.data)
+      setTotalCollection(response.data.totalDailyCollection);
+     
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+  fetchCollectionForToday();
+}, [])
+
+
 
 useEffect(() => {
   const fetchCollectionByNumberForSession = async () => {
@@ -180,7 +202,7 @@ console.log("performanceData",performanceData)
         </div>
 
         <div className="chart-container">
-          <h2>Total Amount Collected by agents in this session</h2>
+          <h2>Total Amount Collected by agents in this session-</h2>
           <PieChart width={300} height={300}>
             <Pie
               data={pieData}
@@ -206,7 +228,7 @@ console.log("performanceData",performanceData)
         </div>
         <div className="chart-container">
           <h2>Amount Collected Today-</h2>
-          <h2>Amount Collected Today</h2>
+          <h1 style={{color:"white"}}>{totalCollection}</h1>
          
           {/* <h2>Total amount collected in this session: {currentSession.totalAmountCollected}</h2> */}
         </div>

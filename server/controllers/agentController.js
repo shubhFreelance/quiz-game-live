@@ -101,6 +101,38 @@ export const getAgentBetsByNumberForSession = async (req, res) => {
   }
 };
 
+export const getAgentBetsByNumberForCurrentSession = async (req, res) => {
+  const { agentId } = req.params;
+
+  try {
+    // Find the current session (status: "open")
+    const currentSession = await Session.findOne({ status: "open" });
+    if (!currentSession) {
+      return res.status(404).json({ message: "No active session found" });
+    }
+
+    // Extract bets for the specific agent in the current session
+    const agentBets = currentSession.betsByNumber.map((entry) => {
+      const agentEntry = entry.agents.find(
+        (agentEntry) => agentEntry.agentId.toString() === agentId
+      );
+
+      return {
+        numberOrAlphabet: entry.numberOrAlphabet,
+        amount: agentEntry ? agentEntry.amount : 0,
+      };
+    });
+
+    res.status(200).json({
+      agentId,
+      sessionId: currentSession._id,
+      bets: agentBets,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 
 //calculate daily collection
 export const getDailyCollection = async () => {

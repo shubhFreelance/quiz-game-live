@@ -1,9 +1,7 @@
-import { Button, Input } from "antd";
+import { Button, Input, message } from "antd"; // Import message from antd
 import React, { useEffect, useState } from "react";
 import "../styles/Dashboard.css";
 import axios from "axios";
-
-// import axios from "axios";
 
 const Betting = ({ agentId, sessionId, sessionStatus, fetchAmount }) => {
   const [rows, setRows] = useState([
@@ -21,6 +19,7 @@ const Betting = ({ agentId, sessionId, sessionStatus, fetchAmount }) => {
     { id: "K", value: "", apiUrl: "https://api.example.com/submit3" },
     { id: "Q", value: "", apiUrl: "https://api.example.com/submit3" },
     { id: "A", value: "", apiUrl: "https://api.example.com/submit3" },
+    { id: "Joker", value: "", apiUrl: "https://api.example.com/submit3" },
   ]);
 
   const handleChange = (id, newValue) => {
@@ -29,34 +28,40 @@ const Betting = ({ agentId, sessionId, sessionStatus, fetchAmount }) => {
     );
   };
 
-  // console.log("Betting :", agentId, sessionId, sessionStatus);
-
   const handleSubmit = async (id) => {
     const row = rows.find((row) => row.id === id);
     if (!row.value.trim()) {
-      alert("Input cannot be empty!");
+      message.error("Input cannot be empty!"); // Show error message if input is empty
       return;
-    } else {
-      const numberOrAlphabet = row.id;
-      const amount = row.value;
-      axios
-        .post("/api/bet/bet", {
-          agentId,
-          numberOrAlphabet,
-          amount,
-          sessionId,
-        })
-        .then((res) => {
-          console.log("Successfull bet:", res.data);
-          fetchAmount();
-          // setSessionData(res.data);
-          // setSessionStatus(res.data.status);
-        })
-        .catch((err) => {
-          console.error("Error Betting:", err);
-        });
     }
-    // console.log(row.value);
+
+    const numberOrAlphabet = row.id;
+    const amount = row.value;
+
+    try {
+      const response = await axios.post("/api/bet/bet", {
+        agentId,
+        numberOrAlphabet,
+        amount,
+        sessionId,
+      });
+
+      console.log("Successful bet:", response.data);
+
+      // Reset the input field to empty
+      setRows((prevRows) =>
+        prevRows.map((row) => (row.id === id ? { ...row, value: "" } : row))
+      );
+
+      // Show success message with the amount
+      message.success(`${amount} is added to the current session for '${numberOrAlphabet}'`);
+
+      // Fetch updated amount
+      fetchAmount();
+    } catch (error) {
+      console.error("Error Betting:", error);
+      message.error("Failed to add amount. Please try again."); // Show error message on failure
+    }
   };
 
   return (

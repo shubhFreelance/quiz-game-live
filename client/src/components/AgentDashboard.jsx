@@ -187,6 +187,7 @@ const AgentDashboard = () => {
     const fetchAgentBets = async () => {
       try {
         const response = await axios.get(`/api/agent/${agent.userId}/current-session-bets`);
+        console.log("Agent Bets:", response.data);
         const { bets } = response.data;
   
         // Update the chart data

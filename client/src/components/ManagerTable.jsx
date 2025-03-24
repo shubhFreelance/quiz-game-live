@@ -1,11 +1,7 @@
 import React from "react";
 
 const ManagerTable = () => {
-  const managers = [
-    { id: 1, name: "Manager 1", data: { 1: 100, 2: 200, A: 300 } },
-    { id: 2, name: "Manager 2", data: { 3: 150, 4: 250, Q: 350 } },
-  ];
-
+ 
   return (
     <div className="manager-tables">
       {managers.map((manager) => (

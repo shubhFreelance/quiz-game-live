@@ -1,44 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, ConfigProvider, Input, Modal, theme } from "antd";
+import { Button, Card, ConfigProvider, Input, Modal, theme, message } from "antd";
 import "../styles/Results.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Results = () => {
-  const [sessionData, setSessionData] = useState([]);
+  const navigate = useNavigate();
+  const [sessionData, setSessionData] = useState(null);
   const [result, setResult] = useState("");
-  const [sessionStatus, setSessionStatus] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const sessionTimings = {
-    1: "9:00 AM - 12:00 PM",
-    2: "1:00 PM - 4:00 PM",
-    3: "5:00 PM - 9:00 PM",
-  };
-
+  const [isResultModalOpen, setIsResultModalOpen] = useState(false);
+  const [declaredResult, setDeclaredResult] = useState("");
+  
   const sessions = [
-    { title: "Session 1", time: "9AM-12PM" },
-    { title: "Session 2", time: "1PM-4PM" },
-    { title: "Session 3", time: "5PM-9PM" },
+    { id: 1, title: "Session 1", time: "9AM-12PM" },
+    { id: 2, title: "Session 2", time: "1PM-4PM" },
+    { id: 3, title: "Session 3", time: "5PM-9PM" },
   ];
 
   useEffect(() => {
     fetchSessionStatus();
-  }, [sessionStatus]); // Call API whenever sessionStatus changes
+  }, []);
 
   const fetchSessionStatus = () => {
     axios
       .get("/api/session/active")
       .then((res) => {
-        console.log("Session Active Data:", res.data);
         setSessionData(res.data);
-        setSessionStatus(res.data.status);
       })
       .catch((err) => {
-        setSessionStatus("close");
         console.error("Error fetching session data:", err);
+        setSessionData(null);
       });
   };
 
-  const handleStart = () => {
+  const handleStart = (sessionId) => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/");
@@ -46,7 +42,7 @@ const Results = () => {
       axios
         .post(
           "/api/session/start",
-          {},
+          { sessionId },
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -55,91 +51,85 @@ const Results = () => {
           }
         )
         .then((res) => {
-          console.log("Agent Data:", res.data);
-          // setSessionData(res.data.session);
-          console.log("session :", sessionData);
-          // alert("data come");
           fetchSessionStatus();
+          message.success("Session started successfully!");
         })
         .catch((err) => {
-          // navigate("/login");
-          console.log("Error fetching agents:", err);
+          message.error("Error starting session");
+          console.log("Error starting session:", err);
         });
     }
   };
+
   const handleChange = (e) => {
     setResult(e.target.value);
   };
 
   const handleEnd = () => {
-    console.log("End Click");
     setIsModalOpen(true);
   };
+
   const handleDeclare = () => {
+    if (!result) {
+      message.error("Please enter a result before declaring");
+      return;
+    }
+
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/");
-    } else {
-      axios
-        .post(
-          "/api/session/end",
-          { result },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        )
-        .then((res) => {
-          console.log("Session Ended Successfully", res.data);
-          setIsModalOpen(false);
-          setSessionData(null);
-          fetchSessionStatus();
-        })
-        .catch((err) => {
-          // navigate("/login");
-          console.log("Error Session End:", err);
-        });
+      return;
     }
+
+    axios.post(
+      "/api/session/end",
+      { result },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    )
+    .then((res) => {
+      setDeclaredResult(result);
+      setIsModalOpen(false);
+      setIsResultModalOpen(true);
+      setResult("");
+      fetchSessionStatus();
+      message.success("Result declared successfully!");
+    })
+    .catch((err) => {
+      message.error("Error declaring result");
+      console.log("Error ending session:", err);
+    });
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
+  const handleResultModalClose = () => {
+    setIsResultModalOpen(false);
+  };
+
   return (
     <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
-      <div className="container d-flex justify-content-center gap-3 flex-wrap mt-4  py-4">
-        {sessions.map((session, index) => (
+      <div className="container d-flex justify-content-center gap-3 flex-wrap mt-4 py-4">
+        {sessions.map((session) => (
           <Card
-            key={index}
+            key={session.id}
             className="shadow-sm"
             style={{ width: 250, background: "#333", border: "1px solid #444" }}
           >
             <h5 className="text-white text-center">{session.title}</h5>
             <h6 className="text-white text-center my-3">{session.time}</h6>
-            {sessionStatus === "close" ? (
-              <Button
-                type="primary"
-                style={{
-                  backgroundColor: "#28a745",
-                  borderColor: "#28a745",
-                }}
-                onMouseOver={(e) =>
-                  (e.target.style.backgroundColor = "#28a745")
-                }
-                onMouseOut={(e) => (e.target.style.backgroundColor = "#28a745")}
-                block
-                onClick={handleStart}
-              >
-                Start
-              </Button>
-            ) : (
+            
+            {sessionData?.sessionNumber === session.id ? (
               <>
                 <Button
-                  color="danger"
-                  variant="solid"
+                  type="primary"
+                  danger
                   block
                   onClick={handleEnd}
                 >
@@ -151,8 +141,8 @@ const Results = () => {
                   footer={[
                     <Button
                       key="submit"
-                      color="danger"
-                      variant="solid"
+                      type="primary"
+                      danger
                       block
                       onClick={handleDeclare}
                     >
@@ -160,19 +150,73 @@ const Results = () => {
                     </Button>,
                   ]}
                 >
-                  <h6>Result</h6>
+                  <h6 className="text-white">Enter Result</h6>
                   <Input
                     name="result"
                     value={result}
                     onChange={handleChange}
                     className="my-3"
+                    placeholder="Enter the winning number/alphabet"
                   />
                 </Modal>
               </>
+            ) : (
+              <Button
+                type="primary"
+                style={{
+                  backgroundColor: "#28a745",
+                  borderColor: "#28a745",
+                }}
+                block
+                onClick={() => handleStart(session.id)}
+              >
+                Start
+              </Button>
             )}
           </Card>
         ))}
       </div>
+
+      {/* Big Result Announcement Modal */}
+      <Modal
+        title={<span style={{ color: 'white', fontSize: '20px' }}>🎉 RESULT ANNOUNCEMENT 🎉</span>}
+        visible={isResultModalOpen}
+        onCancel={handleResultModalClose}
+        footer={null}
+        width={600}
+        centered
+        bodyStyle={{ 
+          backgroundColor: '#1f1f1f', 
+          padding: '40px',
+          textAlign: 'center'
+        }}
+      >
+        <div style={{ margin: '20px 0' }}>
+          <p style={{ color: 'white', fontSize: '18px', marginBottom: '10px' }}>The winning number is:</p>
+          <div style={{
+            fontSize: '72px',
+            fontWeight: 'bold',
+            color: '#52c41a',
+            margin: '30px 0',
+            textShadow: '0 0 10px rgba(82, 196, 26, 0.7)'
+          }}>
+            {declaredResult}
+          </div>
+          <p style={{ color: '#aaa', fontStyle: 'italic' }}>Session successfully closed</p>
+        </div>
+        <Button 
+          type="primary" 
+          size="large"
+          onClick={handleResultModalClose}
+          style={{ 
+            width: '150px',
+            height: '40px',
+            marginTop: '20px'
+          }}
+        >
+          OK
+        </Button>
+      </Modal>
     </ConfigProvider>
   );
 };

@@ -228,10 +228,8 @@ console.log("performanceData",performanceData)
         </div>
         <div className="chart-container">
           <h2>Amount Collected Today-</h2>
-          <h1 style={{color:"white"}}>{totalCollection}</h1>
-         
-          {/* <h2>Total amount collected in this session: {currentSession.totalAmountCollected}</h2> */}
-        </div>
+          <h2>{totalCollection}</h2>
+          </div>
       </div>
       <AgentTable agentsData={agentsData} currentSession={currentSession} />
     </div>

@@ -102,3 +102,56 @@ export const getLast15DaysResults = async (req, res) => {
     });
   }
 };
+
+export const getTodayResults = async (req, res) => {
+  try {
+    // Get today's date at midnight (start of day)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    
+    // Get today's date at 23:59:59 (end of day)
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    // Find all closed sessions with results for today
+    const sessions = await Session.find({
+      status: 'closed',
+      result: { $exists: true, $ne: null },
+      date: { 
+        $gte: todayStart,
+        $lte: todayEnd
+      }
+    })
+    .sort({ 
+      sessionNumber: 1 // Sort by session number in ascending order
+    })
+    .select('_id sessionNumber result date endTime')
+    .lean();
+
+    if (sessions.length === 0) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'No results found for today' 
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      date: todayStart.toISOString().split('T')[0], // Format: YYYY-MM-DD
+      results: sessions.map(session => ({
+        sessionId: session._id,
+        sessionNumber: session.sessionNumber,
+        result: session.result,
+        endTime: session.endTime
+      })),
+      totalSessions: sessions.length
+    });
+  } catch (error) {
+    console.error('Error in getTodayResults:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to fetch today\'s results',
+      error: error.message 
+    });
+  }
+};

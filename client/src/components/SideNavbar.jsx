@@ -58,7 +58,7 @@ const SideNavbar = () => {
   return (
     isAuthenticated && ( // Only render the sidebar if the user is authenticated
       <div className="sidenav">
-        <h2>Winner Dashboard</h2>
+        <h2>Goa Winner</h2>
         {user?.role === "superadmin" ? (
           <Link to="/dashboard">Dashboard</Link>
         ) : (

@@ -132,7 +132,7 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   const { isAuthenticated, login, logout } = useAuth();
 
-  axios.defaults.baseURL = "http://api.goawinner.fun";
+  axios.defaults.baseURL = "https://api.goawinner.fun";
 
   // Fetch user data and set authentication state on component mount
   useEffect(() => {

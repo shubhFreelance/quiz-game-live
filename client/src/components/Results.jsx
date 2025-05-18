@@ -13,9 +13,9 @@ const Results = () => {
   const [declaredResult, setDeclaredResult] = useState("");
   
   const sessions = [
-    { id: 1, title: "Session 1", time: "9AM-12PM" },
-    { id: 2, title: "Session 2", time: "1PM-4PM" },
-    { id: 3, title: "Session 3", time: "5PM-9PM" },
+    { id: 1, title: "Session 1", time: "9AM-11AM" },
+    { id: 2, title: "Session 2", time: "12PM-2PM" },
+    { id: 3, title: "Session 3", time: "3PM-5PM" },
   ];
 
   useEffect(() => {
